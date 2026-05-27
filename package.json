@@ -1,0 +1,38 @@
+{
+  "name": "axure-mcp",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Axure RP .rp file reverse engineering + MCP server (work in progress)",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/mcp-server.js",
+    "smoke": "tsx src/smoke-test.ts",
+    "analyze": "tsx research/analyze.ts",
+    "hexdump": "tsx research/hexdump.ts",
+    "scan-tags": "tsx research/scan-tags.ts",
+    "ascii-runs": "tsx research/ascii-runs.ts",
+    "try-inflate": "tsx research/try-inflate.ts",
+    "try-gunzip": "tsx research/try-gunzip.ts",
+    "extract-records": "tsx research/extract-records.ts",
+    "dump-schema": "tsx research/dump-schema.ts",
+    "diff-schemas": "tsx research/diff-schemas.ts",
+    "find-u32": "tsx research/find-u32.ts",
+    "parse-payload": "tsx research/parse-payload.ts",
+    "scan-strefs": "tsx research/scan-strefs.ts",
+    "find-field-values": "tsx research/find-field-values.ts",
+    "enumerate-f64s": "tsx research/enumerate-f64s.ts",
+    "diff-files": "tsx research/diff-files.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "lucide-static": "^1.16.0",
+    "zod": "^4.4.3"
+  }
+}

@@ -1,0 +1,40 @@
+node_modules/
+dist/
+
+# Local samples & user backups (each user generates their own)
+samples/*.rp
+samples/*.rplib
+samples/extracted/
+samples/backup_*.rp
+samples/axvg/_*.json
+
+# Temp output from research scripts
+research/_*.bin
+research/_*.png
+research/_*.csv
+research/_*.json
+research/_*.html
+research/clip-now-*.bin
+research/clip-now-*.txt
+research/clipboard-dump.txt
+research/screenshot*.png
+research/region.png
+research/full.png
+research/inspect*.png
+research/colors_*.png
+research/wh.png
+research/feedback*.png
+research/lucide_*.png
+research/novel_login*.png
+research/video_player.png
+research/axure_*.png
+research/svg_*.png
+research/tech_stack.png
+research/layout_test.png
+research/rotation_test.png
+research/ui_icons.png
+
+# Editor
+*.log
+.vscode/
+.idea/

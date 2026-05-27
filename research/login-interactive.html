@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Acme · 登录</title>
+<style>
+  /* ===== 色板, 对应 Axure 原型 ===== */
+  :root {
+    --bg:        #FFFFFF;
+    --panel:     #FAFAFA;
+    --card:      #F4F4F5;
+    --input-bg:  #F9FAFB;
+    --text:      #0F172A;
+    --text-mid:  #475569;
+    --text-lite: #94A3B8;
+    --border:    #E2E8F0;
+    --primary:   #0F172A;
+    --primary-text: #FFFFFF;
+    --cta:       #E5141C;          /* 登录主按钮的红 */
+    --cta-hover: #C8121A;
+    --accent:    #2563EB;
+    --danger:    #DC2626;
+    --success:   #059669;
+    --divider:   #E5E7EB;
+  }
+
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--panel);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  /* ===== 设备容器 ===== */
+  .device {
+    width: 376px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 36px 24px 24px;
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
+  }
+
+  /* ===== 标题区 ===== */
+  .brand {
+    text-align: center;
+    margin: 24px 0 36px;
+  }
+  .brand-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+  }
+
+  /* ===== 表单 ===== */
+  form { display: flex; flex-direction: column; gap: 16px; }
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-mid);
+    margin-bottom: 6px;
+  }
+  .input-wrap { position: relative; }
+  .input {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--input-bg);
+    font-size: 13px;
+    color: var(--text);
+    transition: border-color .15s, background .15s;
+    font-family: inherit;
+  }
+  .input::placeholder { color: var(--text-lite); }
+  .input:hover { border-color: #CBD5E1; }
+  .input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg);
+  }
+  .input.invalid { border-color: var(--danger); background: #FEF2F2; }
+  .error-msg {
+    margin: 6px 0 0;
+    font-size: 11px;
+    color: var(--danger);
+    min-height: 14px;
+  }
+  .field.password .input { padding-right: 44px; }
+  .eye-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-mid);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+  .eye-btn:hover { background: var(--card); }
+  .eye-btn svg { width: 22px; height: 12px; }
+
+  /* ===== 记住我 / 忘记密码 ===== */
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .remember { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+  .check {
+    width: 16px; height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, border-color .15s;
+  }
+  .remember input { position: absolute; opacity: 0; pointer-events: none; }
+  .remember input:checked + .check {
+    background: var(--primary);
+    border-color: var(--primary);
+  }
+  .remember input:checked + .check::after {
+    content: "✓";
+    color: var(--primary-text);
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .link { color: var(--accent); text-decoration: none; font-weight: 500; cursor: pointer; }
+  .link:hover { text-decoration: underline; }
+
+  /* ===== 主按钮 ===== */
+  .btn-primary {
+    margin-top: 8px;
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: 10px;
+    background: var(--cta);
+    color: var(--primary-text);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .15s, opacity .15s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: var(--cta-hover); }
+  .btn-primary:active { transform: translateY(1px); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .spinner {
+    display: none;
+    width: 14px; height: 14px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-primary[data-state="submitting"] .spinner { display: inline-block; }
+
+  /* ===== 分隔线 with "或" ===== */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0 16px;
+    font-size: 11px;
+    color: var(--text-lite);
+  }
+  .divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--divider);
+  }
+
+  /* ===== 第三方登录 ===== */
+  .oauth-row { display: flex; gap: 12px; }
+  .btn-oauth {
+    flex: 1;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: inherit;
+    transition: background .15s, border-color .15s;
+  }
+  .btn-oauth:hover { background: var(--card); border-color: #CBD5E1; }
+  .oauth-glyph {
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 11px;
+  }
+  .oauth-glyph.g { background: var(--card); }
+  .oauth-glyph.a { background: var(--primary); color: var(--primary-text); }
+
+  /* ===== 注册入口 ===== */
+  .signup-row {
+    margin: 28px 0 0;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-mid);
+  }
+  .signup-row .link { margin-left: 4px; }
+
+  /* ===== 条款 ===== */
+  .terms {
+    margin: 32px 0 0;
+    text-align: center;
+    font-size: 10px;
+    color: var(--text-lite);
+    line-height: 1.5;
+  }
+  .terms a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+  .terms a:hover { color: var(--text-mid); }
+
+  /* ===== 全局成功/错误反馈 ===== */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: var(--primary);
+    color: var(--primary-text);
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+    box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); }
+  .toast.success { background: var(--success); }
+
+  /* ===== 状态机指示 (左下角) ===== */
+  .status-pill {
+    position: fixed;
+    left: 16px;
+    bottom: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: var(--text-mid);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    box-shadow: 0 2px 8px rgba(0,0,0,.04);
+  }
+  .status-pill .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-lite);
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .status-pill[data-state="validating"] .dot { background: #F59E0B; }
+  .status-pill[data-state="submitting"] .dot { background: var(--accent); }
+  .status-pill[data-state="success"]    .dot { background: var(--success); }
+  .status-pill[data-state="error"]      .dot { background: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="device" role="main">
+  <!-- 1. 标题区 (无 logo, 无副标题) -->
+  <div class="brand">
+    <h1 class="brand-title">欢迎登录</h1>
+  </div>
+
+  <form id="login-form" novalidate>
+    <!-- 2. 邮箱 -->
+    <div class="field">
+      <label for="email">邮箱</label>
+      <div class="input-wrap">
+        <input class="input" type="email" id="email" name="email"
+               placeholder="you@example.com" autocomplete="username"
+               tabindex="1" required />
+      </div>
+      <p class="error-msg" id="email-err"></p>
+    </div>
+
+    <!-- 3. 密码 + 眼睛 -->
+    <div class="field password">
+      <label for="password">密码</label>
+      <div class="input-wrap">
+        <input class="input" type="password" id="password" name="password"
+               placeholder="••••••••" autocomplete="current-password"
+               tabindex="2" required minlength="6" />
+        <button type="button" class="eye-btn" id="eye-toggle"
+                tabindex="-1" aria-label="切换密码可见性">
+          <!-- 横向 pill 风格的眼睛, 内含小圆点 -->
+          <svg id="eye-icon" viewBox="0 0 28 14" fill="none" stroke="currentColor"
+               stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="2" width="26" height="10" rx="5"/>
+            <circle cx="19" cy="7" r="2.4" fill="currentColor" stroke="none"/>
+          </svg>
+        </button>
+      </div>
+      <p class="error-msg" id="password-err"></p>
+    </div>
+
+    <!-- 4. 记住我 / 忘记密码 -->
+    <div class="row">
+      <label class="remember">
+        <input type="checkbox" id="remember" tabindex="3" checked />
+        <span class="check"></span>
+        <span>记住我</span>
+      </label>
+      <a class="link" id="forgot-link" tabindex="6">忘记密码？</a>
+    </div>
+
+    <!-- 5. 主登录按钮 -->
+    <button type="submit" class="btn-primary" id="login-btn" tabindex="4"
+            data-state="idle">
+      <span class="spinner"></span>
+      <span class="btn-label">登录</span>
+    </button>
+  </form>
+
+  <!-- 分隔线 -->
+  <div class="divider">或</div>
+
+  <!-- 6. 第三方登录 -->
+  <div class="oauth-row">
+    <button class="btn-oauth" id="oauth-google" tabindex="5">
+      <span class="oauth-glyph g">G</span>
+      <span>Google</span>
+    </button>
+    <button class="btn-oauth" id="oauth-apple" tabindex="5">
+      <span class="oauth-glyph a"></span>
+      <span>Apple</span>
+    </button>
+  </div>
+
+  <!-- 7. 注册入口 -->
+  <p class="signup-row">
+    还没有账号？<a class="link" id="signup-link" tabindex="7">立即注册</a>
+  </p>
+
+  <!-- 8. 条款 -->
+  <p class="terms">
+    继续即表示同意
+    <a href="#terms" target="_blank" rel="noopener">服务条款</a>
+    与
+    <a href="#privacy" target="_blank" rel="noopener">隐私政策</a>
+  </p>
+</div>
+
+<!-- 全局 toast -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- 状态机指示 -->
+<div class="status-pill" id="status-pill" data-state="idle">
+  <span class="dot"></span><span id="state-text">idle</span>
+</div>
+
+<script>
+  // ====== 状态机: idle → validating → submitting → success | error ======
+  const states = ['idle', 'validating', 'submitting', 'success', 'error'];
+  const statusPill = document.getElementById('status-pill');
+  const stateText = document.getElementById('state-text');
+  function setState(s) {
+    statusPill.dataset.state = s;
+    stateText.textContent = s;
+  }
+
+  // ====== Toast ======
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function toast(msg, kind = 'info', ms = 2400) {
+    toastEl.textContent = msg;
+    toastEl.className = 'toast show ' + (kind === 'error' ? 'error' : kind === 'success' ? 'success' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), ms);
+  }
+
+  // ====== 邮箱校验 (RFC 5322 简化版) ======
+  const EMAIL_RE = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
+  const emailInput = document.getElementById('email');
+  const emailErr = document.getElementById('email-err');
+  function validateEmail(showInline = true) {
+    const v = emailInput.value.trim();
+    let err = '';
+    if (!v) err = '请输入邮箱';
+    else if (!EMAIL_RE.test(v)) err = '邮箱格式不正确';
+    if (showInline) {
+      emailErr.textContent = err;
+      emailInput.classList.toggle('invalid', !!err);
+    }
+    return !err;
+  }
+  emailInput.addEventListener('blur', () => validateEmail(true));
+  emailInput.addEventListener('input', () => {
+    if (emailErr.textContent) {
+      emailErr.textContent = '';
+      emailInput.classList.remove('invalid');
+    }
+  });
+
+  // ====== 密码校验 + 眼睛切换 ======
+  const pwdInput = document.getElementById('password');
+  const pwdErr = document.getElementById('password-err');
+  const eyeBtn = document.getElementById('eye-toggle');
+  const eyeIcon = document.getElementById('eye-icon');
+
+  // 横向 pill 风格: 隐藏密码时小圆点在右, 显示密码时小圆点在左 (类似 toggle 开关)
+  const EYE_HIDDEN  = `<rect x="1" y="2" width="26" height="10" rx="5"/><circle cx="19" cy="7" r="2.4" fill="currentColor" stroke="none"/>`;
+  const EYE_VISIBLE = `<rect x="1" y="2" width="26" height="10" rx="5"/><circle cx="9"  cy="7" r="2.4" fill="currentColor" stroke="none"/>`;
+
+  eyeBtn.addEventListener('click', () => {
+    const showing = pwdInput.type === 'text';
+    pwdInput.type = showing ? 'password' : 'text';
+    eyeIcon.innerHTML = showing ? EYE_HIDDEN : EYE_VISIBLE;
+    eyeBtn.setAttribute('aria-label', showing ? '显示密码' : '隐藏密码');
+  });
+
+  function validatePassword(showInline = true) {
+    const v = pwdInput.value;
+    let err = '';
+    if (!v) err = '请输入密码';
+    else if (v.length < 6) err = '密码至少 6 个字符';
+    if (showInline) {
+      pwdErr.textContent = err;
+      pwdInput.classList.toggle('invalid', !!err);
+    }
+    return !err;
+  }
+  pwdInput.addEventListener('blur', () => validatePassword(true));
+  pwdInput.addEventListener('input', () => {
+    if (pwdErr.textContent) {
+      pwdErr.textContent = '';
+      pwdInput.classList.remove('invalid');
+    }
+  });
+
+  // ====== 提交逻辑 (模拟后端) ======
+  const form = document.getElementById('login-form');
+  const loginBtn = document.getElementById('login-btn');
+  const btnLabel = loginBtn.querySelector('.btn-label');
+
+  // 模拟一组测试账号
+  const MOCK_USERS = {
+    'demo@acme.com': 'demo123',
+    'admin@acme.com': 'admin123',
+  };
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setState('validating');
+    const emailOk = validateEmail(true);
+    const pwdOk = validatePassword(true);
+    if (!emailOk || !pwdOk) {
+      setState('error');
+      toast('请检查输入', 'error');
+      setTimeout(() => setState('idle'), 1500);
+      return;
+    }
+
+    // 提交中
+    setState('submitting');
+    loginBtn.disabled = true;
+    loginBtn.dataset.state = 'submitting';
+    btnLabel.textContent = '登录中...';
+
+    // 模拟 800ms 网络
+    await new Promise(r => setTimeout(r, 800));
+
+    const email = emailInput.value.trim().toLowerCase();
+    const expected = MOCK_USERS[email];
+
+    loginBtn.disabled = false;
+    loginBtn.dataset.state = 'idle';
+    btnLabel.textContent = '登录';
+
+    if (expected && expected === pwdInput.value) {
+      setState('success');
+      const remember = document.getElementById('remember').checked;
+      toast(`登录成功 (remember: ${remember ? '是 · 30天' : '否'})`, 'success');
+      // 真实场景: location.href = '/home'
+    } else {
+      setState('error');
+      pwdErr.textContent = '邮箱或密码错误';
+      pwdInput.classList.add('invalid');
+      toast('账号或密码错误', 'error');
+      setTimeout(() => setState('idle'), 1500);
+    }
+  });
+
+  // ====== 第三方登录 ======
+  document.getElementById('oauth-google').addEventListener('click', () => {
+    toast('跳转 Google OAuth ...', 'info');
+    // 真实场景: location.href = '/oauth/google'
+  });
+  document.getElementById('oauth-apple').addEventListener('click', () => {
+    toast('跳转 Apple OAuth ...', 'info');
+    // 真实场景: location.href = '/oauth/apple'
+  });
+
+  // ====== 找回密码 / 注册 ======
+  document.getElementById('forgot-link').addEventListener('click', () => {
+    toast('跳转邮箱验证码重置流程', 'info');
+    // 真实场景: location.href = '/forgot'
+  });
+  document.getElementById('signup-link').addEventListener('click', () => {
+    toast('跳转注册页 /signup', 'info');
+    // 真实场景: location.href = '/signup'
+  });
+
+  // 友好提示: 显示测试账号
+  setTimeout(() => {
+    toast('试试 demo@acme.com / demo123', 'info', 3500);
+  }, 400);
+</script>
+</body>
+</html>
